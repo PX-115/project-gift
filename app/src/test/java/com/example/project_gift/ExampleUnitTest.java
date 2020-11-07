@@ -1,4 +1,4 @@
-package unis.edu.project_gift;
+package com.example.project_gift;
 
 import org.junit.Test;
 

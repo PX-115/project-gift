@@ -1,21 +1,6 @@
 <resources>
     <string name="app_name">project-gift</string>
-
-    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
-    <string name="back4app_app_id">w73ar8PPtoQNOs5rBNl7cAQ8mPJILEHKfjuQLPZF</string>
-    <string name="back4app_client_key">gNYeaHwAiQ3qIkIllXPMnFF7mimFqoKk9UCKRb03</string>
-
-    <string name="title_aguarde">Por favor, aguarde...</string>
-    <string name="message_save_user">Salvando usuário</string>
-
-    <string name="informe_usuario">Informe um nome de usuário</string>
-    <string name="senha_em_branco">Digite uma senha</string>
-    <string name="confirmacao_senha_em_branco">Digite a confirmação de senha</string>
-    <string name="senhas_nao_coincidem">Senhas não coincidem</string>
-
-    <string name="sucesso_usuario_cadastro">Usuário cadastrado com sucesso!</string>
-    <string name="bem_vindo_usuario">Bem-vindo %1$s</string>
-
-    <string name="sucesso_login">Usuário logado com sucesso!</string>
-    <string name="bem_vindo_de_volta">Bem-vindo de volta %1$s</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
