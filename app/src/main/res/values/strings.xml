@@ -2,5 +2,27 @@
     <string name="app_name">project-gift</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Notificações</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_students">Aluno</string>
+    <string name="title_teacher">Professor</string>
+    <string name="prompt_email">E-mail</string>
+    <string name="prompt_password">Senha</string>
+    <string name="action_sign_in">Entrar ou registrar</string>
+    <string name="action_sign_in_short">Entrar</string>
+    <string name="welcome">"Bem-vindo"</string>
+    <string name="invalid_username">Nome de usuário inválido</string>
+    <string name="invalid_password">Senha precisa ter >5 caracteres</string>
+    <string name="login_failed">"Falha no logon"</string>
+
+    <!-- Firebase error codes -->
+    <string name="email_already_exists">auth/email-already-exists</string>
+
+    <!-- Firebase collections -->
+    <string name="student_collection">student</string>
+    <string name="teacher_collection">teacher</string>
+    <string name="curso_collection">curso</string>
+    <string name="disciplina_collection">disciplina</string>
+    <string name="aula_collection">aula</string>
+    <string name="aulaStudent_collection">aula_student</string>
 </resources>
