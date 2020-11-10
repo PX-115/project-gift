@@ -25,4 +25,13 @@
     <string name="disciplina_collection">disciplina</string>
     <string name="aula_collection">aula</string>
     <string name="aulaStudent_collection">aula_student</string>
+
+    <!-- StudentHome messages -->
+    <string name="time_not_found">Nenhum horário localizado</string>
+    <string name="wait_aula_starts">Aguarde inicio da aula</string>
+    <string name="waiting_entry">Aguardando confirmação de entrada</string>
+    <string name="waiting_exit">Aguardando saida</string>
+    <string name="presence_confirmed">Presença confirmada</string>
+    <string name="check_in">CHECK-IN</string>
+    <string name="check_out">CHECK-OUT</string>
 </resources>

@@ -5,13 +5,16 @@ public class Disciplina {
     private String cursoId;
     private String userId;
 
+    public Disciplina() {
+    }
+
     public Disciplina(String name, String cursoId, String userId) {
         this.name = name;
         this.cursoId = cursoId;
         this.userId = userId;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
