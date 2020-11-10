@@ -20,6 +20,7 @@ import com.example.project_gift.model.Aula;
 import com.example.project_gift.model.AulaStudent;
 import com.example.project_gift.model.Curso;
 import com.example.project_gift.model.Disciplina;
+import com.example.project_gift.model.Student;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -48,7 +49,7 @@ public class StudentHomeFragment extends Fragment {
     private MutableLiveData<String> mStatus = new MutableLiveData<>();
     private MutableLiveData<String> mButtonText = new MutableLiveData<>();
 
-    private Context context;
+    private Student aluno;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_student_home, container, false);
@@ -71,8 +72,10 @@ public class StudentHomeFragment extends Fragment {
         buttonSave = root.findViewById(R.id.buttonSave);
 
         // initial values
-        mStatus.setValue(getString(R.string.time_not_found));
-        buttonSave.setText(getString(R.string.check_in));
+        aluno = (Student) LoggedUser.getType();
+
+        mStatus.setValue("Nenhum horário localizado");
+        buttonSave.setText("CHECK-IN");
         buttonSave.setVisibility(View.VISIBLE);
         buttonSave.setEnabled(false);
 
@@ -86,22 +89,9 @@ public class StudentHomeFragment extends Fragment {
 
         // set values
         setAlunoText();
+        getCurso();
 
         return root;
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        this.context = context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        this.context = null;
     }
 
     private void setAlunoText() {
@@ -109,13 +99,8 @@ public class StudentHomeFragment extends Fragment {
     }
 
     private void getCurso() {
-        cursoRef.whereEqualTo("userId", LoggedUser.getLoggedUser().getUid())
-                .addSnapshotListener((queryDocumentSnapshots, e) -> {
-                    if (e != null || queryDocumentSnapshots.getDocuments().size() == 0) {
-                        return;
-                    }
-
-                    DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+        cursoRef.document(aluno.getCursoId())
+                .addSnapshotListener((documentSnapshot, e) -> {
                     Curso curso = documentSnapshot.toObject(Curso.class);
                     mCurso.setValue(curso.getName());
 
@@ -146,7 +131,7 @@ public class StudentHomeFragment extends Fragment {
     private void resetViews() {
         textHora.setVisibility(View.GONE);
         textDisciplina.setVisibility(View.GONE);
-        mStatus.setValue(context.getString(R.string.time_not_found));
+        mStatus.setValue("Nenhum horário localizado");
         textStatus.setTextColor(getResources().getColor(R.color.flame_red));
         imageView.setImageResource(R.drawable.ic_close_red);
         buttonSave.setEnabled(false);
@@ -253,14 +238,14 @@ public class StudentHomeFragment extends Fragment {
             textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
             imageView.setImageResource(R.drawable.ic_wait_time);
         } else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
-            mStatus.setValue(context.getString(R.string.waiting_exit));
+            mStatus.setValue("Aguardando confirmação de saida");
             textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
             imageView.setImageResource(R.drawable.ic_exit);
 
-            mButtonText.setValue(context.getString(R.string.check_out));
+            mButtonText.setValue("CHECK-OUT");
             buttonSave.setEnabled(true);
         } else {
-            mStatus.setValue(context.getString(R.string.presence_confirmed));
+            mStatus.setValue("Presença confirmada");
             textStatus.setTextColor(getResources().getColor(R.color.sea_green));
             imageView.setImageResource(R.drawable.ic_check_green);
         }
@@ -270,10 +255,10 @@ public class StudentHomeFragment extends Fragment {
         buttonSave.setVisibility(View.VISIBLE);
 
         if (!aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
-            mButtonText.setValue(context.getString(R.string.check_in));
+            mButtonText.setValue("CHECK-IN");
             buttonSave.setEnabled(!aula.getStartDate().after(Calendar.getInstance().getTime()));
         } else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
-            mButtonText.setValue(context.getString(R.string.check_out));
+            mButtonText.setValue("CHECK-OUT");
             buttonSave.setEnabled(true);
         } else {
             buttonSave.setVisibility(View.GONE);
