@@ -25,6 +25,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import org.w3c.dom.Document;
+
 import java.util.Calendar;
 
 public class StudentHomeFragment extends Fragment {
@@ -49,7 +51,10 @@ public class StudentHomeFragment extends Fragment {
     private MutableLiveData<String> mStatus = new MutableLiveData<>();
     private MutableLiveData<String> mButtonText = new MutableLiveData<>();
 
+    private MutableLiveData<Integer> mStatusTextColor = new MutableLiveData<>();
+
     private Student aluno;
+    private DocumentSnapshot aulaStudent = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_student_home, container, false);
@@ -86,6 +91,10 @@ public class StudentHomeFragment extends Fragment {
         mDate.observe(getViewLifecycleOwner(), s -> textHora.setText(s));
         mStatus.observe(getViewLifecycleOwner(), s -> textStatus.setText(s));
         mButtonText.observe(getViewLifecycleOwner(), s -> buttonSave.setText(s));
+        mStatusTextColor.observe(getViewLifecycleOwner(), color -> textStatus.setTextColor(getResources().getColor(color)));
+
+        // events
+        buttonSave.setOnClickListener(v -> setStatusPresenca());
 
         // set values
         setAlunoText();
@@ -121,6 +130,7 @@ public class StudentHomeFragment extends Fragment {
 
                     DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
                     Aula aula = documentSnapshot.toObject(Aula.class);
+
                     mDate.setValue(setAulaTime(aula));
 
                     getDisciplina(aula.getDisciplinaId());
@@ -135,6 +145,7 @@ public class StudentHomeFragment extends Fragment {
         textStatus.setTextColor(getResources().getColor(R.color.flame_red));
         imageView.setImageResource(R.drawable.ic_close_red);
         buttonSave.setEnabled(false);
+        aulaStudent = null;
     }
 
     private String setAulaTime(Aula aula) {
@@ -144,11 +155,11 @@ public class StudentHomeFragment extends Fragment {
         Calendar now = Calendar.getInstance();
 
         final String timeFormatString = "HH:mm";
-        final String dateTimeFormatString = "EEEE, dd MMMM, às HH:mm";
+        final String dateTimeFormatString = "EEEE, dd MMMM, HH:mm";
 
         String retorno = "";
         if (startTime.before(now)) {
-            retorno = "Iniciou hoje às " + DateFormat.format(timeFormatString, startTime);
+            retorno = "Hoje às " + DateFormat.format(timeFormatString, startTime);
         } else {
             if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
                 retorno = "Hoje " + DateFormat.format(timeFormatString, startTime);
@@ -211,6 +222,8 @@ public class StudentHomeFragment extends Fragment {
 
                     DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
                     AulaStudent aulaStudent = documentSnapshot.toObject(AulaStudent.class);
+                    this.aulaStudent = documentSnapshot;
+
                     validateStudent(aulaStudent);
                     setButtonStatus(aula, aulaStudent);
                 });
@@ -219,13 +232,13 @@ public class StudentHomeFragment extends Fragment {
     private void validateAula(Aula aula) {
         if (aula.getStartDate().after(Calendar.getInstance().getTime())) {
             mStatus.setValue("Aguarde inicio da aula");
-            textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
+            mStatusTextColor.setValue(R.color.energy_yellow);
             imageView.setImageResource(R.drawable.ic_wait_time);
 
             buttonSave.setEnabled(true);
         } else if (aula.getStartDate().before(Calendar.getInstance().getTime())) {
             mStatus.setValue("Aguardando confirmação de entrada");
-            textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
+            mStatusTextColor.setValue(R.color.energy_yellow);
             imageView.setImageResource(R.drawable.ic_wait_time);
 
             buttonSave.setEnabled(true);
@@ -235,18 +248,18 @@ public class StudentHomeFragment extends Fragment {
     private void validateStudent(AulaStudent aulaStudent) {
         if (!aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
             mStatus.setValue("Aguardando confirmação de entrada");
-            textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
+            mStatusTextColor.setValue(R.color.energy_yellow);
             imageView.setImageResource(R.drawable.ic_wait_time);
         } else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
             mStatus.setValue("Aguardando confirmação de saida");
-            textStatus.setTextColor(getResources().getColor(R.color.energy_yellow));
+            mStatusTextColor.setValue(R.color.energy_yellow);
             imageView.setImageResource(R.drawable.ic_exit);
 
             mButtonText.setValue("CHECK-OUT");
             buttonSave.setEnabled(true);
         } else {
             mStatus.setValue("Presença confirmada");
-            textStatus.setTextColor(getResources().getColor(R.color.sea_green));
+            mStatusTextColor.setValue(R.color.sea_green);
             imageView.setImageResource(R.drawable.ic_check_green);
         }
     }
@@ -262,6 +275,18 @@ public class StudentHomeFragment extends Fragment {
             buttonSave.setEnabled(true);
         } else {
             buttonSave.setVisibility(View.GONE);
+        }
+    }
+
+    private void setStatusPresenca() {
+        AulaStudent aulaStudent = this.aulaStudent.toObject(AulaStudent.class);
+
+        if (!aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
+            aulaStudentsRef.document(this.aulaStudent.getId()).update("checkIn", true);
+            aulaStudentsRef.document(this.aulaStudent.getId()).update("checkInTime", Calendar.getInstance().getTime());
+        } else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {
+            aulaStudentsRef.document(this.aulaStudent.getId()).update("checkOut", true);
+            aulaStudentsRef.document(this.aulaStudent.getId()).update("checkOutTime", Calendar.getInstance().getTime());
         }
     }
 }
