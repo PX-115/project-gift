@@ -1,15 +1,17 @@
 package com.example.project_gift.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Aula {
+public class Aula implements Serializable {
+    private String aulaId;
     private Date startDate;
     private Date endDate;
     private String cursoId;
     private String disciplinaId;
     private String userId;
 
-    public Aula(){
+    public Aula() {
     }
 
     public Aula(Date startHour, Date endDate, String cursoId, String disciplinaId, String userId) {
@@ -18,6 +20,14 @@ public class Aula {
         this.cursoId = cursoId;
         this.disciplinaId = disciplinaId;
         this.userId = userId;
+    }
+
+    public String getAulaId() {
+        return aulaId;
+    }
+
+    public void setAulaId(String aulaId) {
+        this.aulaId = aulaId;
     }
 
     public Date getStartDate() {

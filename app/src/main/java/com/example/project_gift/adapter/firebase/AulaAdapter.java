@@ -1,4 +1,4 @@
-package com.example.project_gift.adapter;
+package com.example.project_gift.adapter.firebase;
 
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -18,7 +18,6 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
 
@@ -41,7 +40,7 @@ public class AulaAdapter extends FirestoreRecyclerAdapter<Aula, AulaAdapter.Aula
                 .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Disciplina disciplina = task.getResult().toObject(Disciplina.class);
-                holder.textDisciplina.setText(disciplina.getName());
+                holder.textDisciplina.setText(disciplina.getNome());
             }
         });
 

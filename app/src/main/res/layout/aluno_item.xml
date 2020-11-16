@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/textViewAluno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nome"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/checkboxEntrada"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Entrada"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewAluno"
+            android:enabled="false"/>
+
+        <TextView
+            android:id="@+id/textViewStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(23/10/2020 00:00:00.000)"
+            app:layout_constraintBottom_toBottomOf="@id/checkboxEntrada"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/checkboxEntrada" />
+
+        <CheckBox
+            android:id="@+id/checkboxSaida"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Saida"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkboxEntrada"
+            android:enabled="false" />
+
+        <TextView
+            android:id="@+id/textViewEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(23/10/2020 00:00:00.000)"
+            app:layout_constraintBottom_toBottomOf="@id/checkboxSaida"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/checkboxSaida" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

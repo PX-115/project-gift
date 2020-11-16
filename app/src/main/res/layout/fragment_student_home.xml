@@ -81,8 +81,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:src="@drawable/ic_close_red"
-        app:layout_constraintBottom_toBottomOf="@id/buttonSave"
-        app:layout_constraintTop_toBottomOf="@id/text_hora" />
+        app:layout_constraintTop_toBottomOf="@id/text_curso"
+        app:layout_constraintBottom_toTopOf="@id/buttonSave" />
 
     <TextView
         android:id="@+id/text_status"

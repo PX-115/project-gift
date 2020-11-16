@@ -1,6 +1,8 @@
 package com.example.project_gift.model;
 
-public class Curso {
+import java.io.Serializable;
+
+public class Curso implements Serializable {
     private String name;
     private String userId;
 

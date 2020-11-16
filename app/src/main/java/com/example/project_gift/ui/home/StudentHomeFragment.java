@@ -1,6 +1,14 @@
-package com.example.project_gift.ui.home;
+    package com.example.project_gift.ui.home;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -8,8 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
@@ -25,11 +36,12 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import org.w3c.dom.Document;
-
 import java.util.Calendar;
+import java.util.List;
 
 public class StudentHomeFragment extends Fragment {
+
+    private final int REQUEST_CHANGE_WIFI_STATE_PERMISSION = 1;
 
     private TextView textView;
     private TextView textCurso;
@@ -54,7 +66,11 @@ public class StudentHomeFragment extends Fragment {
     private MutableLiveData<Integer> mStatusTextColor = new MutableLiveData<>();
 
     private Student aluno;
+    private DocumentSnapshot aula = null;
     private DocumentSnapshot aulaStudent = null;
+
+    private WifiManager wifiManager;
+    private final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_student_home, container, false);
@@ -78,6 +94,11 @@ public class StudentHomeFragment extends Fragment {
 
         // initial values
         aluno = (Student) LoggedUser.getType();
+        wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            Toast.makeText(getActivity().getApplicationContext(), "Turning WiFi ON...", Toast.LENGTH_LONG).show();
+            wifiManager.setWifiEnabled(true);
+        }
 
         mStatus.setValue("Nenhum horário localizado");
         buttonSave.setText("CHECK-IN");
@@ -94,7 +115,18 @@ public class StudentHomeFragment extends Fragment {
         mStatusTextColor.observe(getViewLifecycleOwner(), color -> textStatus.setTextColor(getResources().getColor(color)));
 
         // events
-        buttonSave.setOnClickListener(v -> setStatusPresenca());
+        buttonSave.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
+            } else {
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+                getActivity().registerReceiver(receiverWifi, intentFilter);
+                getWifi();
+            }
+        });
 
         // set values
         setAlunoText();
@@ -104,7 +136,7 @@ public class StudentHomeFragment extends Fragment {
     }
 
     private void setAlunoText() {
-        mAluno.setValue("Bem-vindo, \n" + LoggedUser.getLoggedUser().getEmail());
+        mAluno.setValue("Bem-vindo, " + LoggedUser.getLoggedUser().getDisplayName());
     }
 
     private void getCurso() {
@@ -129,6 +161,8 @@ public class StudentHomeFragment extends Fragment {
                     textHora.setVisibility(View.VISIBLE);
 
                     DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                    this.aula = documentSnapshot;
+
                     Aula aula = documentSnapshot.toObject(Aula.class);
 
                     mDate.setValue(setAulaTime(aula));
@@ -145,6 +179,7 @@ public class StudentHomeFragment extends Fragment {
         textStatus.setTextColor(getResources().getColor(R.color.flame_red));
         imageView.setImageResource(R.drawable.ic_close_red);
         buttonSave.setEnabled(false);
+        aula = null;
         aulaStudent = null;
     }
 
@@ -159,16 +194,16 @@ public class StudentHomeFragment extends Fragment {
 
         String retorno = "";
         if (startTime.before(now)) {
-            retorno = "Hoje às " + DateFormat.format(timeFormatString, startTime);
+            retorno = "Inicio: Hoje às " + DateFormat.format(timeFormatString, startTime);
         } else {
             if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
-                retorno = "Hoje " + DateFormat.format(timeFormatString, startTime);
+                retorno = "Inicio: Hoje " + DateFormat.format(timeFormatString, startTime);
             } else if (now.get(Calendar.DATE) - startTime.get(Calendar.DATE) == 1) {
-                retorno = "Amanhã " + DateFormat.format(timeFormatString, startTime);
+                retorno = "Inicio: Amanhã " + DateFormat.format(timeFormatString, startTime);
             } else if (now.get(Calendar.YEAR) == startTime.get(Calendar.YEAR)) {
-                retorno = DateFormat.format(dateTimeFormatString, startTime).toString();
+                retorno = "Inicio: " + DateFormat.format(dateTimeFormatString, startTime).toString();
             } else {
-                retorno = DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
+                retorno = "Inicio: " + DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
             }
         }
         retorno = retorno + "\n" + addEndTime(aula);
@@ -200,7 +235,7 @@ public class StudentHomeFragment extends Fragment {
                     if (task.isSuccessful()) {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         Disciplina disciplina = documentSnapshot.toObject(Disciplina.class);
-                        mDisciplina.setValue(disciplina.getName());
+                        mDisciplina.setValue(disciplina.getNome());
                         textDisciplina.setVisibility(View.VISIBLE);
                     }
                 });
@@ -278,7 +313,82 @@ public class StudentHomeFragment extends Fragment {
         }
     }
 
+    private void getWifi() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Toast.makeText(getContext(), "version> = marshmallow", Toast.LENGTH_SHORT).show();
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "location turned off", Toast.LENGTH_SHORT).show();
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
+            } else {
+                Toast.makeText(getContext(), "location turned on", Toast.LENGTH_SHORT).show();
+                wifiManager.startScan();
+            }
+        } else {
+            Toast.makeText(getContext(), "scanning", Toast.LENGTH_SHORT).show();
+            wifiManager.startScan();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    //Broadcast receiver
+    StringBuilder sb;
+    private final BroadcastReceiver receiverWifi = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
+                sb = new StringBuilder();
+                List<ScanResult> wifiList = wifiManager.getScanResults();
+                for (ScanResult scanResult : wifiList) {
+                    sb.append("\n").append(scanResult.SSID).append(" - ").append(scanResult.capabilities);
+                }
+
+                setStatusPresenca();
+
+                getActivity().unregisterReceiver(receiverWifi);
+                Toast.makeText(context, sb, Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    private AulaStudent newAulaStudent() {
+        return new AulaStudent(
+                aula.getId(),
+                LoggedUser.getLoggedUser().getUid(),
+                null,
+                null,
+                false,
+                false
+        );
+    }
+
+
     private void setStatusPresenca() {
+        if (this.aulaStudent == null) {
+            AulaStudent aulaStudent = newAulaStudent();
+            aulaStudentsRef.add(aulaStudent)
+                    .addOnSuccessListener(documentReference -> documentReference.get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                this.aulaStudent = documentSnapshot;
+                                saveAulaStudent();
+                            }));
+        } else {
+            saveAulaStudent();
+        }
+    }
+
+    private void saveAulaStudent() {
         AulaStudent aulaStudent = this.aulaStudent.toObject(AulaStudent.class);
 
         if (!aulaStudent.isCheckIn() && !aulaStudent.isCheckOut()) {

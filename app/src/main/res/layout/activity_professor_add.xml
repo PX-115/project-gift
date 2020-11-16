@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.user.AlunoAddActivity">
+    tools:context=".ui.user.ProfessorAddActivity">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/nome"
@@ -29,40 +29,60 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/nome" />
-
     <TextView
-        android:id="@+id/textViewCurso"
-        style="@style/selectableTextView"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/prompt_curso_selecionar"
-        android:textAlignment="center"
+        android:layout_marginEnd="16dp"
+        android:text="Disciplinas lecionadas"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@id/buttonAdd"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nome" />
 
     <View
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0.5dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:background="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/textViewCurso" />
+        app:layout_constraintEnd_toStartOf="@id/buttonAdd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView2" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/buttonNext"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        tools:listitem="@layout/disciplina_item" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:tint="@color/white"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="@id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textView2" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_arrow_right"/>
+        android:src="@drawable/ic_arrow_right"
+        android:tint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

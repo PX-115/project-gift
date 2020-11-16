@@ -2,6 +2,7 @@ package com.example.project_gift.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.example.project_gift.database.Database;
 import com.example.project_gift.model.Aula;
 import com.example.project_gift.model.Disciplina;
 import com.example.project_gift.model.Teacher;
+import com.example.project_gift.ui.user.AlunoSelecionarActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -26,6 +28,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.Calendar;
 
 public class TeacherHomeFragment extends Fragment {
+
+    private final String DOC_AULA = "DOC_AULA";
+    private final String CURSO_NAME = "CURSO_NAME";
 
     private TextView textView;
     private TextView textCurso;
@@ -48,6 +53,7 @@ public class TeacherHomeFragment extends Fragment {
     private MutableLiveData<Integer> mStatusTextColor = new MutableLiveData<>();
 
     private Teacher teacher = null;
+    private Aula aulaDoc;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,7 +78,6 @@ public class TeacherHomeFragment extends Fragment {
 
         // initial values
         mStatus.setValue("Nenhum horário localizado");
-        buttonSave.setText("CHECK-IN");
         buttonSave.setVisibility(View.VISIBLE);
         buttonSave.setEnabled(false);
 
@@ -92,13 +97,11 @@ public class TeacherHomeFragment extends Fragment {
         setAlunoText();
 
         getAula(LoggedUser.getLoggedUser().getUid());
-
-
         return root;
     }
 
     private void setAlunoText() {
-        mProfessor.setValue("Bem-vindo, \n" + LoggedUser.getLoggedUser().getEmail());
+        mProfessor.setValue("Bem-vindo, " + LoggedUser.getLoggedUser().getDisplayName());
     }
 
     private void getAula(String userId) {
@@ -114,6 +117,8 @@ public class TeacherHomeFragment extends Fragment {
 
                     DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
                     Aula aula = documentSnapshot.toObject(Aula.class);
+                    aulaDoc = aula;
+                    aulaDoc.setAulaId(documentSnapshot.getId());
 
                     validateAula(aula);
                     mDate.setValue(setAulaTime(aula));
@@ -125,9 +130,9 @@ public class TeacherHomeFragment extends Fragment {
     private void getDisciplina(String disciplinaId) {
         disciplinaRef.document(disciplinaId).get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         Disciplina disciplina = task.getResult().toObject(Disciplina.class);
-                        mDisciplina.setValue(disciplina.getName());
+                        mDisciplina.setValue(disciplina.getNome());
                         textDisciplina.setVisibility(View.VISIBLE);
                     }
                 });
@@ -153,16 +158,16 @@ public class TeacherHomeFragment extends Fragment {
 
         String retorno = "";
         if (startTime.before(now)) {
-            retorno = "Hoje às " + DateFormat.format(timeFormatString, startTime);
+            retorno = "Inicio: Hoje às " + DateFormat.format(timeFormatString, startTime);
         } else {
             if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
-                retorno = "Hoje " + DateFormat.format(timeFormatString, startTime);
+                retorno = "Inicio: Hoje " + DateFormat.format(timeFormatString, startTime);
             } else if (now.get(Calendar.DATE) - startTime.get(Calendar.DATE) == 1) {
-                retorno = "Amanhã " + DateFormat.format(timeFormatString, startTime);
+                retorno = "Inicio: Amanhã " + DateFormat.format(timeFormatString, startTime);
             } else if (now.get(Calendar.YEAR) == startTime.get(Calendar.YEAR)) {
-                retorno = DateFormat.format(dateTimeFormatString, startTime).toString();
+                retorno = "Inicio: " + DateFormat.format(dateTimeFormatString, startTime).toString();
             } else {
-                retorno = DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
+                retorno = "Inicio: " + DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
             }
         }
         retorno = retorno + "\n" + addEndTime(aula);
@@ -205,7 +210,9 @@ public class TeacherHomeFragment extends Fragment {
     }
 
     private void showActivityAlunos() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(getContext(), AlunoSelecionarActivity.class);
+        intent.putExtra(DOC_AULA, aulaDoc);
+        intent.putExtra(CURSO_NAME, textCurso.getText().toString());
         startActivity(intent);
     }
 }

@@ -14,40 +14,56 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.project_gift.MainActivity;
 import com.example.project_gift.R;
 import com.example.project_gift.auth.LoggedUser;
+import com.example.project_gift.database.Database;
 import com.example.project_gift.enums.UserType;
+import com.example.project_gift.model.Disciplina;
 import com.example.project_gift.model.Student;
 import com.example.project_gift.model.Teacher;
+import com.example.project_gift.ui.user.AlunoAddActivity;
+import com.example.project_gift.ui.user.ProfessorAddActivity;
 import com.example.project_gift.ui.user.UserTypeActivity;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.auth.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final int USER_TYPE_REQUEST = 1;
+    private static final int STUDENT_PROFILE_REQUEST = 2;
+    private static final int TEACHER_PROFILE_REQUEST = 3;
+
     private static final String USER_TYPE = "user_type";
+    private final String USER_PROFILE = "USER_PROFILE";
+    private final String DISCIPLINA = "DISCIPLINA";
+    private final String CURSO = "CURSO";
 
     private LoginViewModel loginViewModel;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore db;
     private CollectionReference studentRef;
     private CollectionReference teacherRef;
+    private CollectionReference disciplinaRef;
 
-    private EditText usernameEditText;
-    private EditText passwordEditText;
+    private TextInputLayout usernameTextInput;
+    private TextInputLayout passwordTextInput;
     private Button loginButton;
     private ProgressBar loadingProgressBar;
+
+    private Student student = null;
+    private Teacher teacher = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,10 +79,11 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         studentRef = db.collection(getString(R.string.student_collection));
         teacherRef = db.collection(getString(R.string.teacher_collection));
+        disciplinaRef = Database.getDisciplinaRef();
 
         // SetUp views
-        usernameEditText = findViewById(R.id.username);
-        passwordEditText = findViewById(R.id.password);
+        usernameTextInput = findViewById(R.id.username);
+        passwordTextInput = findViewById(R.id.password);
         loginButton = findViewById(R.id.login);
         loadingProgressBar = findViewById(R.id.loading);
 
@@ -76,10 +93,14 @@ public class LoginActivity extends AppCompatActivity {
             }
             loginButton.setEnabled(loginFormState.isDataValid());
             if (loginFormState.getUsernameError() != null) {
-                usernameEditText.setError(getString(loginFormState.getUsernameError()));
+                usernameTextInput.setError(getString(loginFormState.getUsernameError()));
+            } else {
+                usernameTextInput.setError(null);
             }
             if (loginFormState.getPasswordError() != null) {
-                passwordEditText.setError(getString(loginFormState.getPasswordError()));
+                passwordTextInput.setError(getString(loginFormState.getPasswordError()));
+            } else {
+                passwordTextInput.setError(null);
             }
         });
 
@@ -96,15 +117,15 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                loginViewModel.loginDataChanged(usernameTextInput.getEditText().getText().toString(),
+                        passwordTextInput.getEditText().getText().toString());
             }
         };
-        usernameEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.addTextChangedListener(afterTextChangedListener);
+        usernameTextInput.getEditText().addTextChangedListener(afterTextChangedListener);
+        passwordTextInput.getEditText().addTextChangedListener(afterTextChangedListener);
 
-        loginButton.setOnClickListener(v -> login(usernameEditText.getText().toString(),
-                passwordEditText.getText().toString()));
+        loginButton.setOnClickListener(v -> login(usernameTextInput.getEditText().getText().toString(),
+                passwordTextInput.getEditText().getText().toString()));
     }
 
     @Override
@@ -113,15 +134,57 @@ public class LoginActivity extends AppCompatActivity {
             if (requestCode == USER_TYPE_REQUEST) {
                 int option = data.getIntExtra(USER_TYPE, UserType.STUDENT.getValue());
                 if (option == UserType.STUDENT.getValue()) {
-                    Student student = new Student(LoggedUser.getLoggedUser().getUid(), "");
-                    saveStudent(student);
+                    student = new Student("", LoggedUser.getLoggedUser().getUid(), "");
+                    LoggedUser.setStudent(student);
+                    openStudentProfileUpdate();
                 } else {
-                    Teacher teacher = new Teacher(LoggedUser.getLoggedUser().getUid());
-                    saveTeacher(teacher);
+                    teacher = new Teacher("", LoggedUser.getLoggedUser().getUid());
+                    LoggedUser.setTeacher(teacher);
+                    openTeacherProfileUpdate();
                 }
+            } else if (requestCode == STUDENT_PROFILE_REQUEST) {
+                assert data != null;
+                UserProfileChangeRequest profileUpdates = data.getParcelableExtra(USER_PROFILE);
+                String cursoId = data.getStringExtra(CURSO);
+                student.setCursoId(cursoId);
+                student.setDisplayName(profileUpdates.getDisplayName());
+
+                updateUserProfile(profileUpdates, null);
+            } else if (requestCode == TEACHER_PROFILE_REQUEST) {
+                assert data != null;
+                UserProfileChangeRequest profileUpdates = data.getParcelableExtra(USER_PROFILE);
+                List<Disciplina> disciplinas = (ArrayList<Disciplina>) data.getSerializableExtra(DISCIPLINA);
+                teacher.setDisplayName(profileUpdates.getDisplayName());
+
+                updateUserProfile(profileUpdates, disciplinas);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void openStudentProfileUpdate() {
+        Intent intent = new Intent(this, AlunoAddActivity.class);
+        startActivityForResult(intent, STUDENT_PROFILE_REQUEST);
+    }
+
+    private void openTeacherProfileUpdate() {
+        Intent intent = new Intent(this, ProfessorAddActivity.class);
+        startActivityForResult(intent, TEACHER_PROFILE_REQUEST);
+    }
+
+    private void updateUserProfile(UserProfileChangeRequest profileUpdates, List<Disciplina> disciplinas) {
+        LoggedUser.getLoggedUser().updateProfile(profileUpdates)
+                .addOnSuccessListener(aVoid -> {
+                    if (LoggedUser.getType() instanceof Student)
+                        saveStudent(student);
+                    else {
+                        saveTeacher(teacher, disciplinas);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Snackbar.make(findViewById(R.id.container), e.getMessage(), Snackbar.LENGTH_SHORT)
+                            .show();
+                });
     }
 
     private void saveStudent(Student student) {
@@ -135,15 +198,22 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void saveTeacher(Teacher teacher) {
+    private void saveTeacher(Teacher teacher, List<Disciplina> disciplinas) {
         teacherRef.document(teacher.getUserId()).set(teacher).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 LoggedUser.setTeacher(teacher);
-                openMainActivity();
+                udpateDisciplinas(disciplinas);
             } else {
                 showSnack(task.getException().getMessage());
             }
         });
+    }
+
+    private void udpateDisciplinas(List<Disciplina> disciplinas) {
+        for(Disciplina disciplina : disciplinas) {
+            disciplinaRef.document(disciplina.getDisciplinaId()).update("userId", disciplina.getUserId());
+        }
+        openMainActivity();
     }
 
     private void getStudentOrTeacher(FirebaseUser user) {

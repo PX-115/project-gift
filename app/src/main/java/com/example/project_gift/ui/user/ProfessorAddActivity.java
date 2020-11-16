@@ -1,71 +1,72 @@
 package com.example.project_gift.ui.user;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.widget.TextView;
 
 import com.example.project_gift.R;
+import com.example.project_gift.adapter.common.DisciplinaAdapter;
 import com.example.project_gift.auth.LoggedUser;
 import com.example.project_gift.database.Database;
-import com.example.project_gift.model.Curso;
-import com.example.project_gift.model.Student;
-import com.example.project_gift.ui.bottomsheet.CursoSelecionarFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.project_gift.model.Disciplina;
+import com.example.project_gift.ui.bottomsheet.DisciplinaSelecionarFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 
-public class AlunoAddActivity extends AppCompatActivity {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProfessorAddActivity extends AppCompatActivity {
 
     private final String USER_PROFILE = "USER_PROFILE";
-    private final String CURSO = "CURSO";
+    private final String DISCIPLINA = "DISCIPLINA";
 
     private TextInputLayout nomeTextInput;
-    private TextView cursoText;
+    private FloatingActionButton buttonAdd;
     private FloatingActionButton buttonNext;
 
     private MutableLiveData<String> mNome = new MutableLiveData<>();
 
     private FirebaseAuth firebaseAuth;
-    private CollectionReference studentRef;
+    private CollectionReference teacherRef;
 
-    private Curso curso = null;
-    private Student student;
+    private RecyclerView recyclerView;
+    private DisciplinaAdapter disciplinaAdapter;
+
+    private MutableLiveData<List<Disciplina>> mDisciplinas = new MutableLiveData<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aluno_add);
-
-        student = (Student) LoggedUser.getType();
+        setContentView(R.layout.activity_professor_add);
 
         // setUp firebase objects
         firebaseAuth = FirebaseAuth.getInstance();
-        studentRef = Database.getStudentRef();
+        teacherRef = Database.getTeacherRef();
 
         // init views
         nomeTextInput = findViewById(R.id.nome);
-        cursoText = findViewById(R.id.textViewCurso);
         buttonNext = findViewById(R.id.buttonNext);
+        buttonAdd = findViewById(R.id.buttonAdd);
+
+        mDisciplinas.setValue(new ArrayList<>());
 
         // set events
         buttonNext.setOnClickListener(v -> save());
-        cursoText.setOnClickListener(v -> {
-            CursoSelecionarFragment cursoSelecionarFragment = new CursoSelecionarFragment();
-            cursoSelecionarFragment.show(getSupportFragmentManager(), "");
+        buttonAdd.setOnClickListener(v -> {
+            DisciplinaSelecionarFragment disciplinaSelecionarFragment = new DisciplinaSelecionarFragment();
+            disciplinaSelecionarFragment.show(getSupportFragmentManager(), "");
         });
 
         // observers
@@ -94,38 +95,38 @@ public class AlunoAddActivity extends AppCompatActivity {
             }
         };
 
+        // configure recyclerview
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        // set adapter
+        mDisciplinas.observe(this, disciplinas -> {
+            disciplinaAdapter = new DisciplinaAdapter();
+            disciplinaAdapter.setDisciplinas(disciplinas);
+            recyclerView.setAdapter(disciplinaAdapter);
+        });
+
         nomeTextInput.getEditText().addTextChangedListener(textWatcher);
     }
 
-    private boolean validateCurso() {
-        if (curso == null) {
-            Snackbar.make(findViewById(R.id.container), "Selecione um curso", Snackbar.LENGTH_SHORT)
-                    .show();
-            return false;
-        }
-        return true;
-    }
-
     private void save() {
-        if (!validateCurso()) {
-            return;
-        }
-
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(nomeTextInput.getEditText().getText().toString())
                 .build();
 
         Intent returnIntent = new Intent();
         returnIntent.putExtra(USER_PROFILE, profileUpdates);
-        returnIntent.putExtra(CURSO, student.getCursoId());
+        returnIntent.putExtra(DISCIPLINA, (Serializable) mDisciplinas.getValue());
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
 
-    public void selectCurso(DocumentSnapshot curso) {
-        this.curso = curso.toObject(Curso.class);
-        student.setCursoId(curso.getId());
+    public void selectDisciplinas(Disciplina disciplina) {
+        disciplina.setUserId(LoggedUser.getLoggedUser().getUid());
+        List<Disciplina> disciplinas = mDisciplinas.getValue();
+        disciplinas.add(disciplina);
 
-        cursoText.setText(this.curso.getName());
+        mDisciplinas.setValue(disciplinas);
     }
 }
