@@ -13,6 +13,7 @@ public class Database {
     private static CollectionReference disciplinaRef = db.collection("disciplina");
     private static CollectionReference aulaRef = db.collection("aula");
     private static CollectionReference aulaStudentRef = db.collection("aula_student");
+    private static CollectionReference equipamentoRef = db.collection("equipamento");
 
     private Database(){}
 

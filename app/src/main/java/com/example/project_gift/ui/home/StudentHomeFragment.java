@@ -1,4 +1,4 @@
-    package com.example.project_gift.ui.home;
+package com.example.project_gift.ui.home;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -193,18 +193,15 @@ public class StudentHomeFragment extends Fragment {
         final String dateTimeFormatString = "EEEE, dd MMMM, HH:mm";
 
         String retorno = "";
-        if (startTime.before(now)) {
-            retorno = "Inicio: Hoje às " + DateFormat.format(timeFormatString, startTime);
+
+        if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
+            retorno = "Inicio: Hoje " + DateFormat.format(timeFormatString, startTime);
+        } else if (now.get(Calendar.DATE) - startTime.get(Calendar.DATE) == 1) {
+            retorno = "Inicio: Amanhã " + DateFormat.format(timeFormatString, startTime);
+        } else if (now.get(Calendar.YEAR) == startTime.get(Calendar.YEAR)) {
+            retorno = "Inicio: " + DateFormat.format(dateTimeFormatString, startTime).toString();
         } else {
-            if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
-                retorno = "Inicio: Hoje " + DateFormat.format(timeFormatString, startTime);
-            } else if (now.get(Calendar.DATE) - startTime.get(Calendar.DATE) == 1) {
-                retorno = "Inicio: Amanhã " + DateFormat.format(timeFormatString, startTime);
-            } else if (now.get(Calendar.YEAR) == startTime.get(Calendar.YEAR)) {
-                retorno = "Inicio: " + DateFormat.format(dateTimeFormatString, startTime).toString();
-            } else {
-                retorno = "Inicio: " + DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
-            }
+            retorno = "Inicio: " + DateFormat.format("dd MMMM yyyy, HH:mm", startTime).toString();
         }
         retorno = retorno + "\n" + addEndTime(aula);
         return retorno;
