@@ -10,38 +10,42 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.project_gift.R;
 import com.example.project_gift.model.Curso;
+import com.example.project_gift.model.Equipamento;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-public class EquipamentoAdapter extends FirestoreRecyclerAdapter<Curso, EquipamentoAdapter.CursoHolder> {
+public class EquipamentoAdapter extends FirestoreRecyclerAdapter<Equipamento, EquipamentoAdapter.EquipamentoHolder> {
     private OnItemClickListener listener;
 
-    public EquipamentoAdapter(@NonNull FirestoreRecyclerOptions<Curso> options) {
+    public EquipamentoAdapter(@NonNull FirestoreRecyclerOptions<Equipamento> options) {
         super(options);
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull CursoHolder holder, int position, @NonNull Curso model) {
-        holder.textCurso.setText(model.getName());
+    protected void onBindViewHolder(@NonNull EquipamentoHolder holder, int position, @NonNull Equipamento model) {
+        holder.textViewSSID.setText(model.getDisplayName());
+        holder.textViewMac.setText(model.getMacAdress());
     }
 
     @NonNull
     @Override
-    public CursoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public EquipamentoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.curso_item, parent, false);
-        return new CursoHolder(v);
+        return new EquipamentoHolder(v);
     }
 
-    class CursoHolder extends RecyclerView.ViewHolder {
+    class EquipamentoHolder extends RecyclerView.ViewHolder {
 
-        private TextView textCurso;
+        private TextView textViewSSID;
+        private TextView textViewMac;
 
-        public CursoHolder(@NonNull View itemView) {
+        public EquipamentoHolder(@NonNull View itemView) {
             super(itemView);
 
-            textCurso = itemView.findViewById(R.id.textCurso);
+            textViewSSID = itemView.findViewById(R.id.textViewSSID);
+            textViewMac = itemView.findViewById(R.id.textViewMac);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();

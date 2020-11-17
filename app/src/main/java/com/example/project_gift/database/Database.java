@@ -40,4 +40,8 @@ public class Database {
     public static CollectionReference getAulaStudentRef() {
         return aulaStudentRef;
     }
+
+    public static CollectionReference getEquipamentoRef() {
+        return  equipamentoRef;
+    }
 }
