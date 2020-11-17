@@ -19,6 +19,8 @@
     <string name="invalid_displayName">Digite um nome</string>
     <string name="cadastro_header">Cadastros</string>
     <string name="configuracoes_header">Configurações</string>
+    <string name="aula_title">Aula</string>
+    <string name="disciplina_title">Disciplina</string>
     <string name=""
 
     <!-- Firebase error codes -->
