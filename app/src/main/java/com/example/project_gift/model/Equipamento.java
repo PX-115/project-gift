@@ -1,8 +1,11 @@
 package com.example.project_gift.model;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 
 public class Equipamento implements Serializable {
+    @Exclude
     private String equipamentoId;
     private String displayName;
     private String macAdress;
@@ -29,5 +32,13 @@ public class Equipamento implements Serializable {
 
     public String getMacAdress() {
         return macAdress;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setMacAdress(String macAdress) {
+        this.macAdress = macAdress;
     }
 }

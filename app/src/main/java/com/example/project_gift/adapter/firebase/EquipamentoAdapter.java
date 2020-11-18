@@ -32,7 +32,7 @@ public class EquipamentoAdapter extends FirestoreRecyclerAdapter<Equipamento, Eq
     @Override
     public EquipamentoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.curso_item, parent, false);
+                .inflate(R.layout.equipamento_item, parent, false);
         return new EquipamentoHolder(v);
     }
 

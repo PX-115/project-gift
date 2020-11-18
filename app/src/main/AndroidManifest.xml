@@ -14,7 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Projectgift">
-        <activity android:name=".ui.equipamento.EquipamentoSelecionar"></activity>
+        <activity android:name=".ui.disciplina.DisciplinaCadastrarActivity"
+            android:parentActivityName=".ui.disciplina.DisciplinaSelecionarActivity"></activity>
+        <activity android:name=".ui.disciplina.DisciplinaSelecionarActivity" />
+        <activity
+            android:name=".ui.equipamento.EquipamentoCadastrarActivity"
+            android:parentActivityName=".ui.equipamento.EquipamentoSelecionar" />
+        <activity android:name=".ui.equipamento.EquipamentoSelecionar" />
         <activity
             android:name=".ui.user.AlunoSelecionarActivity"
             android:parentActivityName=".MainActivity" />

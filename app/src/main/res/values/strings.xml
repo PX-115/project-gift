@@ -1,15 +1,17 @@
 <resources>
     <string name="app_name">project-gift</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notificações</string>
+    <string name="title_horarios">Horários</string>
+    <string name="title_settings">Configurações</string>
     <string name="title_activity_login">Login</string>
     <string name="title_students">Aluno</string>
     <string name="title_teacher">Professor</string>
     <string name="prompt_email">E-mail</string>
     <string name="prompt_password">Senha</string>
     <string name="prompt_nome">Nome</string>
+    <string name="prompt_mac">Endereço MAC</string>
     <string name="prompt_curso_selecionar">Selecionar curso...</string>
+    <string name="prompt_equipamento_selecionar">Selecionar equipamento...</string>
     <string name="action_sign_in">Entrar ou registrar</string>
     <string name="action_sign_in_short">Entrar</string>
     <string name="welcome">"Bem-vindo"</string>
@@ -21,7 +23,7 @@
     <string name="configuracoes_header">Configurações</string>
     <string name="aula_title">Aula</string>
     <string name="disciplina_title">Disciplina</string>
-    <string name=""
+    <string name="equipamento_title">Equipamento</string>
 
     <!-- Firebase error codes -->
     <string name="email_already_exists">auth/email-already-exists</string>
@@ -43,26 +45,4 @@
     <string name="check_in">CHECK-IN</string>
     <string name="check_out">CHECK-OUT</string>
     <string name="title_activity_professor_add">ProfessorAddActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

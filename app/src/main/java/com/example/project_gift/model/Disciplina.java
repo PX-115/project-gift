@@ -1,8 +1,11 @@
 package com.example.project_gift.model;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 
 public class Disciplina implements Serializable {
+    @Exclude
     private String disciplinaId;
     private String nome;
     private String cursoId;

@@ -1,34 +1,17 @@
 package com.example.project_gift;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.project_gift.auth.LoggedUser;
 import com.example.project_gift.model.Student;
-import com.example.project_gift.model.Teacher;
 import com.example.project_gift.ui.dashboard.DashboardFragment;
 import com.example.project_gift.ui.home.StudentHomeFragment;
 import com.example.project_gift.ui.home.TeacherHomeFragment;
-import com.example.project_gift.ui.notifications.NotificationsFragment;
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
+import com.example.project_gift.ui.settings.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.annotation.IdRes;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.MenuRes;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavGraph;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,12 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void newDashboardFragment() {
         selectedFragment = new DashboardFragment();
-        getSupportActionBar().setTitle(getText(R.string.title_dashboard));
+        getSupportActionBar().setTitle(getText(R.string.title_horarios));
     }
 
     private void newNotificationsFragment() {
-        selectedFragment = new NotificationsFragment();
-        getSupportActionBar().setTitle(getText(R.string.title_notifications));
+        selectedFragment = new SettingsFragment();
+        getSupportActionBar().setTitle(getText(R.string.title_settings));
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
