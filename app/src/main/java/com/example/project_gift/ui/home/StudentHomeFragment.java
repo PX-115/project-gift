@@ -349,6 +349,7 @@ public class StudentHomeFragment extends Fragment {
                 List<ScanResult> wifiList = wifiManager.getScanResults();
                 for (ScanResult scanResult : wifiList) {
                     sb.append("\n").append(scanResult.SSID).append(" - ").append(scanResult.capabilities);
+                    scanResult.frequency
                 }
 
                 setStatusPresenca();
