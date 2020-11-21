@@ -14,6 +14,8 @@ import com.example.project_gift.R;
 import com.example.project_gift.adapter.firebase.DisciplinaAdapter;
 import com.example.project_gift.database.Database;
 import com.example.project_gift.model.Disciplina;
+import com.example.project_gift.ui.aula.AulaCadastrarActivity;
+import com.example.project_gift.ui.disciplina.DisciplinaCadastrarActivity;
 import com.example.project_gift.ui.user.ProfessorAddActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -72,7 +74,12 @@ public class DisciplinaSelecionarFragment extends BottomSheetDialogFragment {
     }
 
     private void select(Disciplina disciplina) {
-        ((ProfessorAddActivity)getActivity()).selectDisciplinas(disciplina);
+        String parentActivity = getActivity().getClass().getSimpleName();
+
+        if (parentActivity.equals(ProfessorAddActivity.class.getSimpleName()))
+            ((ProfessorAddActivity) getActivity()).selectDisciplinas(disciplina);
+        else if (parentActivity.equals(AulaCadastrarActivity.class.getSimpleName()))
+            ((AulaCadastrarActivity) getActivity()).setDisciplina(disciplina);
         dismiss();
     }
 }

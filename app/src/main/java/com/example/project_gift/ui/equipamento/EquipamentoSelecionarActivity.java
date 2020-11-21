@@ -20,7 +20,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
-public class EquipamentoSelecionar extends AppCompatActivity {
+public class EquipamentoSelecionarActivity extends AppCompatActivity {
 
 
     private static final String EQUIPAMENTO = "EQUIPAMENTO";

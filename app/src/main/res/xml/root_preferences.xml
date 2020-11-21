@@ -9,12 +9,22 @@
             app:title="@string/aula_title"
             app:useSimpleSummaryProvider="true">
 
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.example.project_gift.ui.aula.AulaCadastrarActivity"
+                android:targetPackage="com.example.project_gift"/>
+
         </Preference>
 
         <Preference
             app:key="disciplina"
             app:title="@string/disciplina_title"
             app:useSimpleSummaryProvider="true">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.example.project_gift.ui.disciplina.DisciplinaSelecionarActivity"
+                android:targetPackage="com.example.project_gift"/>
 
         </Preference>
 
@@ -29,7 +39,7 @@
 
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetClass="com.example.project_gift.ui.equipamento.EquipamentoSelecionar"
+                android:targetClass="com.example.project_gift.ui.equipamento.EquipamentoSelecionarActivity"
                 android:targetPackage="com.example.project_gift"/>
 
         </Preference>

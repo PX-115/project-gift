@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.example.project_gift.adapter.firebase.CursoAdapter;
 import com.example.project_gift.database.Database;
 import com.example.project_gift.model.Curso;
+import com.example.project_gift.ui.disciplina.DisciplinaCadastrarActivity;
 import com.example.project_gift.ui.user.AlunoAddActivity;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -74,7 +75,11 @@ public class CursoSelecionarFragment extends BottomSheetDialogFragment {
     }
 
     private void select(DocumentSnapshot curso) {
-        ((AlunoAddActivity)getActivity()).selectCurso(curso);
+        String parentActivity = getActivity().getClass().getSimpleName();
+        if (parentActivity.equals((AlunoAddActivity.class.getSimpleName())))
+            ((AlunoAddActivity) getActivity()).selectCurso(curso);
+        else if (parentActivity.equals(DisciplinaCadastrarActivity.class.getSimpleName()))
+            ((DisciplinaCadastrarActivity) getActivity()).selectCurso(curso);
         dismiss();
     }
 }

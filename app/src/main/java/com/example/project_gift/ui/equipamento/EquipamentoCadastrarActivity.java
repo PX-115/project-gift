@@ -28,7 +28,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equipamento_cadastrar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Novo equipamento");
+        getSupportActionBar().setTitle("Nova sala de aula");
 
         // initViews
         textInputLayoutName = findViewById(R.id.textInputDisplayName);
@@ -38,7 +38,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Object data = intent.getSerializableExtra(EQUIPAMENTO);
         if (data != null) {
-            getSupportActionBar().setTitle("Editar equipamento");
+            getSupportActionBar().setTitle("Editar sala de aula");
             equipamento = (Equipamento) data;
             assignValues();
         }
@@ -82,6 +82,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         if (equipamento == null) {
             equipamento = new Equipamento(textInputLayoutName.getEditText().getText().toString(),
                     textInputLayoutMac.getEditText().getText().toString());
+            return;
         }
         equipamento.setDisplayName(textInputLayoutName.getEditText().getText().toString());
         equipamento.setMacAdress(textInputLayoutMac.getEditText().getText().toString());

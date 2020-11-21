@@ -11,7 +11,10 @@
     <string name="prompt_nome">Nome</string>
     <string name="prompt_mac">Endereço MAC</string>
     <string name="prompt_curso_selecionar">Selecionar curso...</string>
-    <string name="prompt_equipamento_selecionar">Selecionar equipamento...</string>
+    <string name="prompt_equipamento_selecionar">Selecionar sala...</string>
+    <string name="prompt_disciplina_selecionar">Selecionar disciplina...</string>
+    <string name="prompt_date">dd/MM/yyyy</string>
+    <string name="prompt_time">00:00</string>
     <string name="action_sign_in">Entrar ou registrar</string>
     <string name="action_sign_in_short">Entrar</string>
     <string name="welcome">"Bem-vindo"</string>
@@ -23,7 +26,7 @@
     <string name="configuracoes_header">Configurações</string>
     <string name="aula_title">Aula</string>
     <string name="disciplina_title">Disciplina</string>
-    <string name="equipamento_title">Equipamento</string>
+    <string name="equipamento_title">Sala</string>
 
     <!-- Firebase error codes -->
     <string name="email_already_exists">auth/email-already-exists</string>

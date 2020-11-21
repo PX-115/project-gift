@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.aula.AulaCadastrarActivity"
+    android:id="@+id/container">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewDataInicio"
+        style="@style/selectableTextView"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/prompt_date"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toStartOf="@id/textViewHoraInicio"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewHoraInicio"
+        style="@style/selectableTextView"
+        android:layout_width="100dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/prompt_time"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@id/textViewDataInicio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/textViewDataInicio" />
+
+    <TextView
+        android:id="@+id/textViewDataFinal"
+        style="@style/selectableTextView"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:text="@string/prompt_date"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toStartOf="@id/textViewHoraFinal"
+        app:layout_constraintTop_toBottomOf="@id/textViewDataInicio"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewHoraFinal"
+        style="@style/selectableTextView"
+        android:layout_width="100dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/prompt_time"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@id/textViewDataFinal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewHoraInicio"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/textViewDataFinal" />
+
+    <TextView
+        android:id="@+id/textViewDisciplina"
+        style="@style/selectableTextView"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text="@string/prompt_disciplina_selecionar"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/textViewDataFinal"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/textViewDisciplina"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_check"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

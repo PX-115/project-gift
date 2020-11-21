@@ -37,6 +37,7 @@ public class DisciplinaSelecionarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disciplina_selecionar);
+        getSupportActionBar().setTitle(getString(R.string.disciplina_title));
 
         // initViews
         buttonAdd = findViewById(R.id.buttonAdd);
