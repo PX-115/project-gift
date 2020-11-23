@@ -10,6 +10,7 @@
     <string name="prompt_password">Senha</string>
     <string name="prompt_nome">Nome</string>
     <string name="prompt_mac">Endereço MAC</string>
+    <string name="prompt_distance">Distancia máxima</string>
     <string name="prompt_curso_selecionar">Selecionar curso...</string>
     <string name="prompt_equipamento_selecionar">Selecionar sala...</string>
     <string name="prompt_disciplina_selecionar">Selecionar disciplina...</string>

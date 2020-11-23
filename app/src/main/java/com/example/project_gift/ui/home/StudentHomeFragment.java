@@ -3,6 +3,7 @@ package com.example.project_gift.ui.home;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -27,10 +29,12 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.project_gift.R;
 import com.example.project_gift.auth.LoggedUser;
 import com.example.project_gift.database.Database;
+import com.example.project_gift.functions.DistanceCalculate;
 import com.example.project_gift.model.Aula;
 import com.example.project_gift.model.AulaStudent;
 import com.example.project_gift.model.Curso;
 import com.example.project_gift.model.Disciplina;
+import com.example.project_gift.model.Equipamento;
 import com.example.project_gift.model.Student;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
@@ -55,6 +59,7 @@ public class StudentHomeFragment extends Fragment {
     private CollectionReference aulaRef;
     private CollectionReference aulaStudentsRef;
     private CollectionReference disciplinaRef;
+    private CollectionReference equipamentoRef;
 
     private MutableLiveData<String> mAluno = new MutableLiveData<>();
     private MutableLiveData<String> mCurso = new MutableLiveData<>();
@@ -66,7 +71,8 @@ public class StudentHomeFragment extends Fragment {
     private MutableLiveData<Integer> mStatusTextColor = new MutableLiveData<>();
 
     private Student aluno;
-    private DocumentSnapshot aula = null;
+    private DocumentSnapshot aulaDoc = null;
+    private Aula aula = null;
     private DocumentSnapshot aulaStudent = null;
 
     private WifiManager wifiManager;
@@ -80,6 +86,7 @@ public class StudentHomeFragment extends Fragment {
         aulaRef = Database.getAulaRef();
         aulaStudentsRef = Database.getAulaStudentRef();
         disciplinaRef = Database.getDisciplinaRef();
+        equipamentoRef = Database.getEquipamentoRef();
 
         // Init Views
         textView = root.findViewById(R.id.text_user);
@@ -161,9 +168,9 @@ public class StudentHomeFragment extends Fragment {
                     textHora.setVisibility(View.VISIBLE);
 
                     DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                    this.aula = documentSnapshot;
-
                     Aula aula = documentSnapshot.toObject(Aula.class);
+                    this.aulaDoc = documentSnapshot;
+                    this.aula = aula;
 
                     mDate.setValue(setAulaTime(aula));
 
@@ -179,7 +186,7 @@ public class StudentHomeFragment extends Fragment {
         textStatus.setTextColor(getResources().getColor(R.color.flame_red));
         imageView.setImageResource(R.drawable.ic_close_red);
         buttonSave.setEnabled(false);
-        aula = null;
+        aulaDoc = null;
         aulaStudent = null;
     }
 
@@ -234,6 +241,7 @@ public class StudentHomeFragment extends Fragment {
                         Disciplina disciplina = documentSnapshot.toObject(Disciplina.class);
                         mDisciplina.setValue(disciplina.getNome());
                         textDisciplina.setVisibility(View.VISIBLE);
+                        this.aula.setDisciplina(disciplina);
                     }
                 });
     }
@@ -267,7 +275,7 @@ public class StudentHomeFragment extends Fragment {
             mStatusTextColor.setValue(R.color.energy_yellow);
             imageView.setImageResource(R.drawable.ic_wait_time);
 
-            buttonSave.setEnabled(true);
+            buttonSave.setEnabled(false);
         } else if (aula.getStartDate().before(Calendar.getInstance().getTime())) {
             mStatus.setValue("Aguardando confirmação de entrada");
             mStatusTextColor.setValue(R.color.energy_yellow);
@@ -312,18 +320,18 @@ public class StudentHomeFragment extends Fragment {
 
     private void getWifi() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Toast.makeText(getContext(), "version> = marshmallow", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "versão >= marshmallow", Toast.LENGTH_SHORT).show();
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "location turned off", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Localização desligada", Toast.LENGTH_SHORT).show();
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                         MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
             } else {
-                Toast.makeText(getContext(), "location turned on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Localização ligada", Toast.LENGTH_SHORT).show();
                 wifiManager.startScan();
             }
         } else {
-            Toast.makeText(getContext(), "scanning", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Escaneando", Toast.LENGTH_SHORT).show();
             wifiManager.startScan();
         }
     }
@@ -339,29 +347,58 @@ public class StudentHomeFragment extends Fragment {
     }
 
     //Broadcast receiver
-    StringBuilder sb;
     private final BroadcastReceiver receiverWifi = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
-                sb = new StringBuilder();
                 List<ScanResult> wifiList = wifiManager.getScanResults();
                 for (ScanResult scanResult : wifiList) {
-                    sb.append("\n").append(scanResult.SSID).append(" - ").append(scanResult.capabilities);
+                    Toast.makeText(context, "Dispositivos encontrados", Toast.LENGTH_SHORT).show();
+
+                    Disciplina disciplina = aula.getDisciplina();
+                    Equipamento equipamento = getEquipamento(context, disciplina.getEquipamentoId());
+                    if (equipamento != null && scanResult.BSSID == equipamento.getMacAdress()) {
+                        Toast.makeText(context, "Sala encontrada", Toast.LENGTH_SHORT).show();
+
+                        double distance = DistanceCalculate.calculateDistance(scanResult.level, scanResult.frequency);
+                        if (distance < equipamento.getMaxDistance()) {
+                            Toast.makeText(context, "Ditance = " + distance, Toast.LENGTH_SHORT).show();
+
+                            setStatusPresenca();
+                        } else {
+                            getActivity().unregisterReceiver(receiverWifi);
+                            new AlertDialog.Builder(context)
+                                    .setTitle("Verificação de presença")
+                                    .setMessage("Não foi possivel verificar a presença.")
+                                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+
+                                    })
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        }
+                    }
                 }
-
-                setStatusPresenca();
-
                 getActivity().unregisterReceiver(receiverWifi);
-                Toast.makeText(context, sb, Toast.LENGTH_SHORT).show();
             }
         }
     };
 
+    private Equipamento getEquipamento(Context context, String equipamentoId) {
+        final Equipamento[] equipamento = new Equipamento[1];
+        equipamentoRef.document(equipamentoId)
+                .addSnapshotListener((documentSnapshot, e) -> {
+                    if (e != null) {
+                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    equipamento[0] = documentSnapshot.toObject(Equipamento.class);
+                });
+        return equipamento[0];
+    }
+
     private AulaStudent newAulaStudent() {
         return new AulaStudent(
-                aula.getId(),
+                aulaDoc.getId(),
                 LoggedUser.getLoggedUser().getUid(),
                 null,
                 null,

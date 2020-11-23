@@ -1,5 +1,8 @@
 package com.example.project_gift.model;
 
+import com.example.project_gift.functions.DistanceCalculate;
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 import java.sql.Time;
 import java.util.Date;
@@ -11,6 +14,9 @@ public class Aula implements Serializable {
     private String cursoId;
     private String disciplinaId;
     private String userId;
+
+    @Exclude
+    private Disciplina disciplina;
 
     public Aula() {
     }
@@ -49,5 +55,15 @@ public class Aula implements Serializable {
 
     public String getUserId() {
         return userId;
+    }
+
+    @Exclude
+    public Disciplina getDisciplina() {
+        return disciplina;
+    }
+
+    @Exclude
+    public void setDisciplina(Disciplina disciplina) {
+        this.disciplina = disciplina;
     }
 }

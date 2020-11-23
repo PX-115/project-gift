@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Projectgift">
-        <activity android:name=".ui.aula.AulaCadastrarActivity"></activity>
+        <activity android:name=".ui.aula.AulaVisualizarActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".ui.aula.AulaCadastrarActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".ui.disciplina.DisciplinaCadastrarActivity"
             android:parentActivityName=".ui.disciplina.DisciplinaSelecionarActivity" />
@@ -24,7 +27,8 @@
         <activity
             android:name=".ui.equipamento.EquipamentoCadastrarActivity"
             android:parentActivityName=".ui.equipamento.EquipamentoSelecionarActivity" />
-        <activity android:name=".ui.equipamento.EquipamentoSelecionarActivity" />
+        <activity android:name=".ui.equipamento.EquipamentoSelecionarActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".ui.user.AlunoSelecionarActivity"
             android:parentActivityName=".MainActivity" />

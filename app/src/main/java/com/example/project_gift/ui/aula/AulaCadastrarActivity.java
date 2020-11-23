@@ -67,6 +67,7 @@ public class AulaCadastrarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aula_cadastrar);
+        getSupportActionBar().setTitle("Nova aula");
 
         // initViews
         textViewDataInicio = findViewById(R.id.textViewDataInicio);
@@ -187,7 +188,7 @@ public class AulaCadastrarActivity extends AppCompatActivity {
     }
 
     private boolean validateEndDate() {
-        if (endDate.after(startDate)) {
+        if (endDate.before(startDate)) {
             showSnack("Data inicio deve ser menor ou igual a final");
             return false;
         }

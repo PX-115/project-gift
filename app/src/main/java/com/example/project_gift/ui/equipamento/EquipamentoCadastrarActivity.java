@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.project_gift.R;
-import com.example.project_gift.database.Database;
 import com.example.project_gift.model.Equipamento;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.firestore.CollectionReference;
 
 public class EquipamentoCadastrarActivity extends AppCompatActivity {
 
@@ -19,6 +17,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
 
     private TextInputLayout textInputLayoutName;
     private TextInputLayout textInputLayoutMac;
+    private TextInputLayout textInputLayoutDistance;
     private FloatingActionButton buttonSave;
 
     private Equipamento equipamento = null;
@@ -33,6 +32,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         // initViews
         textInputLayoutName = findViewById(R.id.textInputDisplayName);
         textInputLayoutMac = findViewById(R.id.textInputMacAdress);
+        textInputLayoutDistance = findViewById(R.id.textInputMaxDistance);
         buttonSave = findViewById(R.id.buttonSave);
 
         Intent intent = getIntent();
@@ -49,13 +49,14 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
     private void assignValues() {
         textInputLayoutName.getEditText().setText(equipamento.getDisplayName());
         textInputLayoutMac.getEditText().setText(equipamento.getMacAdress());
+        textInputLayoutDistance.getEditText().setText(Integer.toString(equipamento.getMaxDistance()));
     }
 
     private boolean validate() {
         String displayName = textInputLayoutName.getEditText().getText().toString();
         String macAddress = textInputLayoutMac.getEditText().getText().toString();
 
-        return validateDisplayName(displayName) && validateMac(macAddress);
+        return validateDisplayName(displayName) && validateMac(macAddress) && validateDistance();
     }
 
     private boolean validateDisplayName(String displayName) {
@@ -78,6 +79,16 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         }
     }
 
+    private boolean validateDistance() {
+        if (textInputLayoutDistance.getEditText().getText().toString().isEmpty()) {
+            textInputLayoutDistance.setError("Informe a distância");
+            return false;
+        } else {
+            textInputLayoutDistance.setError(null);
+            return true;
+        }
+    }
+
     private void setValues() {
         if (equipamento == null) {
             equipamento = new Equipamento(textInputLayoutName.getEditText().getText().toString(),
@@ -86,6 +97,7 @@ public class EquipamentoCadastrarActivity extends AppCompatActivity {
         }
         equipamento.setDisplayName(textInputLayoutName.getEditText().getText().toString());
         equipamento.setMacAdress(textInputLayoutMac.getEditText().getText().toString());
+        equipamento.setMaxDistance(Integer.parseInt(textInputLayoutDistance.getEditText().getText().toString()));
     }
 
     private void save() {

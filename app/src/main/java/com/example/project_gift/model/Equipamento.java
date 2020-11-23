@@ -9,6 +9,7 @@ public class Equipamento implements Serializable {
     private String equipamentoId;
     private String displayName;
     private String macAdress;
+    private int maxDistance;
 
     public Equipamento() {
     }
@@ -40,5 +41,13 @@ public class Equipamento implements Serializable {
 
     public void setMacAdress(String macAdress) {
         this.macAdress = macAdress;
+    }
+
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+
+    public void setMaxDistance(int maxDistance) {
+        this.maxDistance = maxDistance;
     }
 }

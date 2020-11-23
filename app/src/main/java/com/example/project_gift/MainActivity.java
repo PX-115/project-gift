@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.example.project_gift.auth.LoggedUser;
 import com.example.project_gift.model.Student;
-import com.example.project_gift.ui.dashboard.DashboardFragment;
+import com.example.project_gift.ui.horario.HorarioFragment;
 import com.example.project_gift.ui.home.StudentHomeFragment;
 import com.example.project_gift.ui.home.TeacherHomeFragment;
 import com.example.project_gift.ui.settings.SettingsFragment;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void newDashboardFragment() {
-        selectedFragment = new DashboardFragment();
+        selectedFragment = new HorarioFragment();
         getSupportActionBar().setTitle(getText(R.string.title_horarios));
     }
 

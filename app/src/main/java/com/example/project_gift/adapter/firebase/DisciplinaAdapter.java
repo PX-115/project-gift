@@ -28,6 +28,9 @@ public class DisciplinaAdapter extends FirestoreRecyclerAdapter<Disciplina, Disc
     @Override
     protected void onBindViewHolder(@NonNull DisciplinaHolder holder, int position, @NonNull Disciplina model) {
         holder.disciplinaText.setText(model.getNome());
+        if(model.getCursoId() == null) {
+            return;
+        }
         cursoRef.document(model.getCursoId())
                 .addSnapshotListener((documentSnapshot, e) -> {
                     Curso curso = documentSnapshot.toObject(Curso.class);
