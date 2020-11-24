@@ -42,6 +42,6 @@ public class Database {
     }
 
     public static CollectionReference getEquipamentoRef() {
-        return  equipamentoRef;
+        return equipamentoRef;
     }
 }

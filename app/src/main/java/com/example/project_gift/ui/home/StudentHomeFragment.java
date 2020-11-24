@@ -40,6 +40,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -353,47 +354,46 @@ public class StudentHomeFragment extends Fragment {
             String action = intent.getAction();
             if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
                 List<ScanResult> wifiList = wifiManager.getScanResults();
-                for (ScanResult scanResult : wifiList) {
-                    Toast.makeText(context, "Dispositivos encontrados", Toast.LENGTH_SHORT).show();
 
-                    Disciplina disciplina = aula.getDisciplina();
-                    Equipamento equipamento = getEquipamento(context, disciplina.getEquipamentoId());
-                    if (equipamento != null && scanResult.BSSID == equipamento.getMacAdress()) {
-                        Toast.makeText(context, "Sala encontrada", Toast.LENGTH_SHORT).show();
-
-                        double distance = DistanceCalculate.calculateDistance(scanResult.level, scanResult.frequency);
-                        if (distance < equipamento.getMaxDistance()) {
-                            Toast.makeText(context, "Ditance = " + distance, Toast.LENGTH_SHORT).show();
-
-                            setStatusPresenca();
-                        } else {
+                Disciplina disciplina = aula.getDisciplina();
+                equipamentoRef.document(disciplina.getEquipamentoId())
+                        .addSnapshotListener((documentSnapshot, e) -> {
+                            if (e != null) {
+                                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                            Equipamento equipamento = documentSnapshot.toObject(Equipamento.class);
+                            scanResults(context, wifiList, equipamento);
                             getActivity().unregisterReceiver(receiverWifi);
-                            new AlertDialog.Builder(context)
-                                    .setTitle("Verificação de presença")
-                                    .setMessage("Não foi possivel verificar a presença.")
-                                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-
-                                    })
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .show();
-                        }
-                    }
-                }
-                getActivity().unregisterReceiver(receiverWifi);
+                        });
             }
         }
     };
 
-    private Equipamento getEquipamento(Context context, String equipamentoId) {
-        final Equipamento[] equipamento = new Equipamento[1];
-        equipamentoRef.document(equipamentoId)
-                .addSnapshotListener((documentSnapshot, e) -> {
-                    if (e != null) {
-                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    equipamento[0] = documentSnapshot.toObject(Equipamento.class);
-                });
-        return equipamento[0];
+    private void scanResults(Context context, List<ScanResult> wifiList, Equipamento equipamento) {
+        for (ScanResult scanResult : wifiList) {
+            Toast.makeText(context, "Dispositivos encontrados", Toast.LENGTH_SHORT).show();
+
+            if (equipamento != null && scanResult.BSSID.equals(equipamento.getMacAdress()) ) {
+                Toast.makeText(context, "Sala encontrada", Toast.LENGTH_SHORT).show();
+
+                double distance = DistanceCalculate.calculateDistance(scanResult.level, scanResult.frequency);
+                Toast.makeText(context, "Ditance = " + distance, Toast.LENGTH_SHORT).show();
+
+                if (distance < equipamento.getMaxDistance()) {
+                    setStatusPresenca();
+                } else {
+                    getActivity().unregisterReceiver(receiverWifi);
+                    new AlertDialog.Builder(context)
+                            .setTitle("Verificação de presença")
+                            .setMessage("Não foi possivel verificar a presença.")
+                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
+            }
+        }
     }
 
     private AulaStudent newAulaStudent() {
