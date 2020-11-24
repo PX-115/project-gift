@@ -1,35 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="500dp"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="500dp">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_wait_yellow_24x"
+        app:layout_constraintBottom_toBottomOf="@id/textViewStatus"
+        app:layout_constraintEnd_toStartOf="@id/textViewStatus"
+        app:layout_constraintTop_toTopOf="@id/textViewStatus" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
+        android:id="@+id/textViewStatus"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Selecione uma sala"
+        android:text="Aguardando check-in"
+        android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="32dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:clipToPadding="false"
+    <TextView
+        android:id="@+id/textViewDataInicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:paddingTop="@dimen/list_item_spacing_half"
-        android:paddingBottom="@dimen/list_item_spacing_half"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:text="Inicio: 00/00/0000 19:55"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewStatus" />
+
+
+    <TextView
+        android:id="@+id/textViewDateFinal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Termino: 00/00/0000 19:55"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewDataInicio" />
+
+    <TextView
+        android:id="@+id/textViewDisciplinaSala"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Disciplina | Sala"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewDateFinal" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/textViewDisciplinaSala" />
+
+    <TextView
+        android:id="@+id/textViewCheckIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Entrada: Não encontrada"
+        android:textAlignment="center"
+        android:textSize="17sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewDisciplinaSala" />
+
+    <TextView
+        android:id="@+id/textViewCheckOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Saída: Não econtrada"
+        android:textAlignment="center"
+        android:textSize="17sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewCheckIn" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Essa aula ainda não começou"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/materialButton"
-        tools:context=".ui.bottomsheet.CursoSelecionarFragment"
-        tools:listitem="@layout/equipamento_item" />
+        app:layout_constraintTop_toBottomOf="@id/textViewDisciplinaSala" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/materialButton"
@@ -41,4 +109,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
