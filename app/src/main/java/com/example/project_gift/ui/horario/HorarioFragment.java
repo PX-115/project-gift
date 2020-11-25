@@ -21,6 +21,7 @@ import com.example.project_gift.model.Curso;
 import com.example.project_gift.model.Student;
 import com.example.project_gift.model.Teacher;
 import com.example.project_gift.ui.aula.AulaVisualizarActivity;
+import com.example.project_gift.ui.bottomsheet.AulaVisualizarFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,6 +61,14 @@ public class HorarioFragment extends Fragment {
         aulaAdapter = new AulaAdapter(options);
         recyclerView.setAdapter(aulaAdapter);
         aulaAdapter.startListening();
+
+        aulaAdapter.setOnItemClickListener((documentSnapshot, position) -> {
+            Aula aula = documentSnapshot.toObject(Aula.class);
+            aula.setAulaId(documentSnapshot.getId());
+
+            AulaVisualizarFragment aulaVisualizarFragment = AulaVisualizarFragment.newInstance(aula, true);
+            aulaVisualizarFragment.show(getActivity().getSupportFragmentManager(), "proximas_aulas");
+        });
 
         return root;
     }

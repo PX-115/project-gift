@@ -13,9 +13,11 @@ import com.example.project_gift.database.Database;
 import com.example.project_gift.model.Aula;
 import com.example.project_gift.model.Student;
 import com.example.project_gift.model.Teacher;
+import com.example.project_gift.ui.bottomsheet.AulaVisualizarFragment;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
 import java.util.Calendar;
@@ -48,6 +50,14 @@ public class AulaVisualizarActivity extends AppCompatActivity {
         aulaAdapter = new AulaAdapter(options, userType instanceof Student ? LoggedUser.getLoggedUser() : null);
         recyclerView.setAdapter(aulaAdapter);
         aulaAdapter.startListening();
+
+        aulaAdapter.setOnItemClickListener((documentSnapshot, position) -> {
+            Aula aula = documentSnapshot.toObject(Aula.class);
+            aula.setAulaId(documentSnapshot.getId());
+
+            AulaVisualizarFragment aulaVisualizarFragment = AulaVisualizarFragment.newInstance(aula, false);
+            aulaVisualizarFragment.show(getSupportFragmentManager(), "aulas_anteriores");
+        });
     }
 
     private FirestoreRecyclerOptions<Aula> getOptionsTeacher(Teacher teacher) {

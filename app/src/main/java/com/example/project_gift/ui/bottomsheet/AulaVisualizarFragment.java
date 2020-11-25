@@ -48,6 +48,7 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
     private TextView textViewDisciplinaSala;
     private TextView textViewCheckIn;
     private TextView textViewCheckOut;
+    private TextView textViewMensagem;
     private ImageView imageView;
 
     private CollectionReference aulaStudentRef;
@@ -69,7 +70,7 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null) {
+        if (getArguments() != null) {
             mAula = (Aula) getArguments().getSerializable(ARG_AULA);
             mProximasAulas = getArguments().getBoolean(ARG_PROXAULA);
         }
@@ -84,9 +85,11 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
         // initViews
         textViewStatus = view.findViewById(R.id.textViewStatus);
         textViewDataInicio = view.findViewById(R.id.textViewDataInicio);
-        textViewDataFinal = view.findViewById(R.id.textViewDataFinal);
+        textViewDataFinal = view.findViewById(R.id.textViewDateFinal);
         textViewDisciplinaSala = view.findViewById(R.id.textViewDisciplinaSala);
-        textViewCheckIn = view.findViewById();
+        textViewCheckIn = view.findViewById(R.id.textViewCheckIn);
+        textViewCheckOut = view.findViewById(R.id.textViewCheckOut);
+        textViewMensagem = view.findViewById(R.id.textViewMensagem);
         imageView = view.findViewById(R.id.imageView);
 
         // init firebase objects
@@ -98,15 +101,25 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
         button.setOnClickListener(v -> dismiss());
 
         // setvalues
-        textViewDataInicio.setText(setAulaTime(mAula));
-        textViewDataFinal.setText(addEndTime(mAula));
+        textViewDataInicio.setText("Inicio: " + setAulaTime(mAula));
+        textViewDataFinal.setText("Término: " + addEndTime(mAula));
         getDisciplina();
 
-        if(!mProximasAulas) {
+        if (!mProximasAulas) {
+            textViewMensagem.setVisibility(View.GONE);
+            textViewCheckIn.setVisibility(View.VISIBLE);
+            textViewCheckOut.setVisibility(View.VISIBLE);
+            textViewStatus.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.VISIBLE);
+
             showAlunoAulaStatus();
         } else {
-            textViewStatus.setVisibility(View.GONE);
-            imageView.setVisibility(View.GONE);
+            textViewMensagem.setVisibility(View.VISIBLE);
+            textViewCheckIn.setVisibility(View.GONE);
+            textViewCheckOut.setVisibility(View.GONE);
+
+            textViewStatus.setText("Aula não iniciada");
+            imageView.setImageResource(R.drawable.ic_wait_yellow_24x);
         }
 
         return view;
@@ -125,7 +138,7 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
     private void getEquipamento(Disciplina disciplina) {
         equipamentoRef.document(disciplina.getEquipamentoId())
                 .addSnapshotListener((documentSnapshot, e) -> {
-                    if(e != null) {
+                    if (e != null) {
                         return;
                     }
                     Equipamento equipamento = documentSnapshot.toObject(Equipamento.class);
@@ -144,8 +157,10 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
 
         if (now.get(Calendar.DATE) == startTime.get(Calendar.DATE)) {
             return "Hoje " + DateFormat.format(timeFormatString, startTime);
+        } else if (now.get(Calendar.DAY_OF_MONTH) - startTime.get(Calendar.DAY_OF_MONTH) == 1) {
+            return "Ontem " + DateFormat.format(timeFormatString, startTime);
         } else if (now.get(Calendar.DATE) - startTime.get(Calendar.DATE) == 1) {
-            return  "Amanhã " + DateFormat.format(timeFormatString, startTime);
+            return "Amanhã " + DateFormat.format(timeFormatString, startTime);
         } else if (now.get(Calendar.YEAR) == startTime.get(Calendar.YEAR)) {
             return DateFormat.format(dateTimeFormatString, startTime).toString();
         } else {
@@ -163,6 +178,8 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
         final String dateTimeFormatString = "EEEE, dd MMMM, HH:mm";
         if (now.get(Calendar.DATE) == endTime.get(Calendar.DATE)) {
             return "Hoje " + DateFormat.format(timeFormatString, endTime);
+        } else if (now.get(Calendar.DAY_OF_MONTH) - endTime.get(Calendar.DAY_OF_MONTH) == 1) {
+            return "Ontem " + DateFormat.format(timeFormatString, endTime);
         } else if (now.get(Calendar.DATE) - endTime.get(Calendar.DATE) == 1) {
             return "Amanhã " + DateFormat.format(timeFormatString, endTime);
         } else if (now.get(Calendar.YEAR) == endTime.get(Calendar.YEAR)) {
@@ -176,6 +193,8 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
         textViewStatus.setText(getStatusString(null, mAula));
         textViewStatus.setTextColor(getResources().getColor(getStatusColor(null, mAula)));
         imageView.setImageResource(getStatusIcon(null, mAula));
+        textViewCheckIn.setText("Entrada: Não encontrado");
+        textViewCheckOut.setText("Saida: Não encontrado");
 
         aulaStudentRef.whereEqualTo("userId", LoggedUser.getLoggedUser().getUid())
                 .whereEqualTo("aulaId", mAula.getAulaId())
@@ -189,20 +208,31 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
                     textViewStatus.setText(getStatusString(aulaStudent, mAula));
                     textViewStatus.setTextColor(getResources().getColor(getStatusColor(aulaStudent, mAula)));
                     imageView.setImageResource(getStatusIcon(aulaStudent, mAula));
+
+                    Calendar startTime = Calendar.getInstance();
+                    startTime.setTime(aulaStudent.getCheckInTime());
+                    String startTimeStr = DateFormat.format("dd/MM/yyyy HH:mm", startTime).toString();
+
+                    Calendar endTime = Calendar.getInstance();
+                    endTime.setTime(aulaStudent.getCheckOutTime());
+                    String endTimeStr = DateFormat.format("dd/MM/yyyy HH:mm", endTime).toString();
+
+                    textViewCheckIn.setText("Entrada: " + startTimeStr);
+                    textViewCheckOut.setText("Saida: " + endTimeStr);
                 });
     }
 
     private String getStatusString(AulaStudent aulaStudent, Aula aula) {
-        if(aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
+        if (aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
             return "Pendente check-in";
-        if(aulaStudent == null)
+        if (aulaStudent == null)
             return "Ausente";
 
         if (aulaStudent.isCheckIn() && aulaStudent.isCheckOut())
             return "Presente";
         else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut())
             return "Pendente check-out";
-        else if(aula.getEndDate().after(Calendar.getInstance().getTime()))
+        else if (aula.getEndDate().after(Calendar.getInstance().getTime()))
             return "Pendente check-in";
         else
             return "Ausente";
@@ -210,17 +240,17 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
 
     @ColorRes
     private int getStatusColor(AulaStudent aulaStudent, Aula aula) {
-        if(aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
+        if (aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
             return R.color.energy_yellow;
 
-        if(aulaStudent == null)
+        if (aulaStudent == null)
             return R.color.flame_red;
 
         if (aulaStudent.isCheckIn() && aulaStudent.isCheckOut())
             return R.color.sea_green;
         else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut())
             return R.color.energy_yellow;
-        else if(aula.getEndDate().after(Calendar.getInstance().getTime()))
+        else if (aula.getEndDate().after(Calendar.getInstance().getTime()))
             return R.color.energy_yellow;
         else
             return R.color.flame_red;
@@ -228,17 +258,17 @@ public class AulaVisualizarFragment extends BottomSheetDialogFragment {
 
     @DrawableRes
     private int getStatusIcon(AulaStudent aulaStudent, Aula aula) {
-        if(aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
+        if (aulaStudent == null && aula.getEndDate().after(Calendar.getInstance().getTime()))
             return R.drawable.ic_wait_yellow_24x;
 
-        if(aulaStudent == null)
+        if (aulaStudent == null)
             return R.drawable.ic_close_red_24x;
 
         if (aulaStudent.isCheckIn() && aulaStudent.isCheckOut())
             return R.drawable.ic_check_green24x;
         else if (aulaStudent.isCheckIn() && !aulaStudent.isCheckOut())
             return R.drawable.ic_wait_yellow_24x;
-        else if(aula.getEndDate().after(Calendar.getInstance().getTime()))
+        else if (aula.getEndDate().after(Calendar.getInstance().getTime()))
             return R.drawable.ic_wait_yellow_24x;
         else
             return R.drawable.ic_close_red_24x;
